@@ -5,12 +5,18 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
  
 const FormSchema = z.object({
-  id: z.string(),
-  customerId: z.string(),
-  amount: z.coerce.number(),
-  status: z.enum(['pending', 'paid']),
-  date: z.string(),
-});
+	id: z.string(),
+	customerId: z.string({
+	  invalid_type_error: 'Please select a customer.',
+	}),
+	amount: z.coerce
+	  .number()
+	  .gt(0, { message: 'Please enter an amount greater than $0.' }),
+	status: z.enum(['pending', 'paid'], {
+	  invalid_type_error: 'Please select an invoice status.',
+	}),
+	date: z.string(),
+  });
  
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 export async function createInvoice(formData: FormData) {
